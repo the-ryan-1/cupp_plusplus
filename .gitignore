@@ -1,0 +1,10 @@
+open.txt
+open2.txt
+test.txt
+test_med.txt
+test_short.txt
+.DS_Store
+.idea
+/build
+/cmake-build-debug
+/cmake-build-release
