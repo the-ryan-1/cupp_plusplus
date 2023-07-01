@@ -585,7 +585,7 @@ int interactive_mode_input(){
     if (permute_level.empty())
         permute_level = "1";
     if(permute_level == "3"){
-        cout << "Last chance to back out now. 1. I've got all day / I'm not going to add many details. Let's do this!"
+        cout << "Last chance to back out now. 1. I've got all day or I'm not going to add many details. Let's do this!"
                 "2 I want to choose a different level. 1/2: ";
         string cant_say_I_didnt_warn_you{};
         getline(cin, cant_say_I_didnt_warn_you);
@@ -838,9 +838,6 @@ permute_level = stoi(profile.at("permute_level"));
 
 void parse_birthday(string bd_full, unordered_set<string> *output);
 
-
-//maybe I should iterate through the unordered map and then set based on value found instead of calling find a dozen plus times.
-
 //put all possible relevant dates from birthdays in a set
 if (profile.find("birthday") != profile.end())
     parse_birthday(profile.at("birthday"), &bday_parsed);
@@ -857,8 +854,8 @@ if (profile.find("kid2_bd") != profile.end())
 
 bool profile_change = false;
 
-if (permute_level == 1)
-    if (profile.find("name") != profile.end()){
+if (permute_level == 1) {
+    if (profile.find("name") != profile.end()) {
         parse_name(profile.at("name"), &profile_combo);
         profile_change = true;
     }
@@ -871,16 +868,15 @@ if (permute_level == 1)
         bool profile_change = true;
     }
 
-    if (profile_change){
-        combine_two_sets(&profile_combo,&profile_combo, &profile_parsed, &final_output);
-        combine_two_sets(&profile_combo,&bday_parsed, &name_bd_combos, &final_output);
+    if (profile_change) {
+        combine_two_sets(&profile_combo, &profile_combo, &profile_parsed, &final_output);
+        combine_two_sets(&profile_combo, &bday_parsed, &name_bd_combos, &final_output);
         profile_combo = {};
         profile_change = false;
     }
 
 
-
-    if (profile.find("spouse") != profile.end()){
+    if (profile.find("spouse") != profile.end()) {
         if (profile.find("surname") != profile.end())
             parse_name(profile.at("surname"), &profile_combo);
         parse_name(profile.at("spouse"), &profile_combo);
@@ -890,16 +886,15 @@ if (permute_level == 1)
         parse_name(profile.at("spouse_nick"), &profile_combo);
         profile_change = true;
     }
-    if (profile_change){
-        combine_two_sets(&profile_combo,&profile_combo, &profile_parsed, &final_output);
-        combine_two_sets(&profile_combo,&bday_parsed, &name_bd_combos, &final_output);
+    if (profile_change) {
+        combine_two_sets(&profile_combo, &profile_combo, &profile_parsed, &final_output);
+        combine_two_sets(&profile_combo, &bday_parsed, &name_bd_combos, &final_output);
         profile_combo = {};
         profile_change = false;
     }
 
 
-
-    if (profile.find("kid1") != profile.end()){
+    if (profile.find("kid1") != profile.end()) {
         if (profile.find("surname") != profile.end())
             parse_name(profile.at("surname"), &profile_combo);
         parse_name(profile.at("kid1"), &profile_combo);
@@ -909,14 +904,14 @@ if (permute_level == 1)
         parse_name(profile.at("kid1_nick"), &profile_combo);
         profile_change = true;
     }
-    if (profile_change){
-        combine_two_sets(&profile_combo,&profile_combo, &profile_parsed, &final_output);
-        combine_two_sets(&profile_combo,&bday_parsed, &name_bd_combos, &final_output);
+    if (profile_change) {
+        combine_two_sets(&profile_combo, &profile_combo, &profile_parsed, &final_output);
+        combine_two_sets(&profile_combo, &bday_parsed, &name_bd_combos, &final_output);
         profile_combo = {};
         profile_change = false;
     }
 
-    if (profile.find("kid2") != profile.end()){
+    if (profile.find("kid2") != profile.end()) {
         if (profile.find("surname") != profile.end())
             parse_name(profile.at("surname"), &profile_combo);
         parse_name(profile.at("kid2"), &profile_combo);
@@ -926,13 +921,13 @@ if (permute_level == 1)
         parse_name(profile.at("kid2_nick"), &profile_combo);
         profile_change = true;
     }
-    if (profile_change){
-        combine_two_sets(&profile_combo,&profile_combo, &profile_parsed, &final_output);
-        combine_two_sets(&profile_combo,&bday_parsed, &name_bd_combos, &final_output);
+    if (profile_change) {
+        combine_two_sets(&profile_combo, &profile_combo, &profile_parsed, &final_output);
+        combine_two_sets(&profile_combo, &bday_parsed, &name_bd_combos, &final_output);
         profile = {};
         profile_change = false;
     }
-
+}
 //put all possible names in a set
 if (permute_level >= 3){
     if (profile.find("name") != profile.end())
@@ -968,18 +963,19 @@ if (permute_level >= 3){
         parse_birthday(profile.at("kid2_bd"), &bday_parsed);
 }
 
-/* This works but is super slow. Might resuse for higher permutation levels but commenting out for testing for now.
 combine_two_sets(&bday_parsed, &bday_parsed,&bday_combos, &final_output);
-if (permute_level >= 2)
+if (permute_level >= 2){
     combine_two_sets(&bday_parsed, &bday_combos,&bday_combos, &final_output);
-combine_two_sets(&name_parsed,&name_parsed, &name_combos, &final_output);
-//super slow if i add this
-// combine_two_sets(&name_parsed,&name_combos, &name_combos, &final_output);
+    combine_two_sets(&name_parsed,&name_parsed, &name_combos, &final_output);
+    combine_two_sets(&bday_combos,&name_combos, &name_bd_combos, &final_output);
 
-combine_two_sets(&bday_combos,&name_combos, &name_bd_combos, &final_output);
+    //super slow if i add this
+// combine_two_sets(&name_parsed,&name_combos, &name_combos, &final_output);
+}
+
+
 if (permute_level >= 3)
     combine_two_sets(&name_bd_combos,&bday_combos, &name_bd_combos, &final_output);
-*/
 
 //debug lines
 
