@@ -2,10 +2,16 @@ cmake_minimum_required(VERSION 3.22)
 project(cupp++)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Security -framework CoreServices")
+set(CMAKE_CXX20_STANDARD_COMPILE_OPTION  "-std=c++20 -std=gnu++20")
+set(CMAKE_CXX20_EXTENSION_COMPILE_OPTION  "-std=gnu++20")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Security -framework CoreServices")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
 
 
-include(FetchContent)
+    include(FetchContent)
 
 FetchContent_Declare(
         Certify
@@ -20,7 +26,7 @@ include_directories(${certify_SOURCE_DIR}/include)
 
 
 
-find_package(Boost 1.82.0 REQUIRED COMPONENTS system date_time filesystem thread regex chrono atomic serialization context coroutine)
+find_package(Boost 1.81.0 REQUIRED COMPONENTS system date_time filesystem thread regex chrono atomic serialization context coroutine)
 find_package(OpenSSL REQUIRED)
 
 add_executable(cupp++ main.cpp)

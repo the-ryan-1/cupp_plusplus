@@ -210,13 +210,19 @@ namespace inipp {
                         detail::rtrim(variable, loc);
                         detail::ltrim(value, loc);
                         auto & sec = sections[section];
-                        if (sec.find(variable) == sec.end())
+                        if (sec.find(variable) == sec.end()){
                             sec.emplace(variable, value);
+                            std::cout << "added " << variable << std::endl;
+                        }
                         else
                             errors.push_back(line);
                     }
                     else {
                         errors.push_back(line);
+                    }
+                    if (is.eof()){
+                        std::cout << "end of file" << std::endl;
+                        return 0;
                     }
                 }
             }

@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "inipp.h"
+#include "inipp.h" // https://github.com/mcmtroffaes/inipp/tree/develop
 
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -25,6 +25,7 @@
 #include <boost/certify/extensions.hpp>
 #include <boost/certify/https_verification.hpp>
 #include <cstdlib>
+#include <filesystem>
 
 
 using namespace std::literals;
@@ -58,7 +59,7 @@ class iniConfig {
 private:
     static inipp::Ini<char> read_config() {
         inipp::Ini<char> ini;
-        std::ifstream is("/Users/ryan/CLionProjects/cupp++/config.ini");
+        std::ifstream is("config.ini");
         if (!is)
             throw std::runtime_error("Config File not found.\n"
                                      "Please make sure config.ini is in your working directory.");
@@ -1402,7 +1403,7 @@ int alectodb_download(){
                     last_comma = i+1;
                 }
             }
-            create_directory(url_directory);
+            std::filesystem::create_directory(url_directory);
             for (auto i: files) {
                 ofstream outputfile(url_directory);
                 outputfile.open(i);
