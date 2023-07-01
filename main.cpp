@@ -185,6 +185,8 @@ void parse_spaces (string input, unordered_set<string> *output);
 void combine_two_sets(unordered_set<string> *input, unordered_set<string> *input2,unordered_set<string> *output_of_func, unordered_set<string> *output_final);
 void add_spechars(string location_spechars, unordered_set<string> *final_words_tmp, vector<string> spechars_vec);
 vector<string> build_spechars();
+std::string getNewFileName(const std::string& fileName);
+
 
 
 
@@ -1087,13 +1089,43 @@ if(profile.find("leet_comprehensive") != profile.end()){
 }
 
     ofstream outputfile;
-    outputfile.open("open2.txt");
+    std::string fileName = "cupp_output.txt";
+    std::string newFileName = getNewFileName(fileName);
+
+    std::ofstream file(newFileName);
+    if (file) {
+        std::cout << "File created/opened: " << newFileName << std::endl;
+        // Rest of your file operations
+    } else {
+        std::cout << "Failed to create/open file." << std::endl;
+    }
+
+    outputfile.open(newFileName);
 
     cout << "Final list length : " << final_output.size() << endl;
     for (auto const &i:final_output){
         if (i.size() <= config.pwd_max_length && i.size() >= config.pwd_min_length)
             outputfile << i << endl;
     }
+}
+
+std::string getNewFileName(const std::string& fileName) {
+    std::ifstream file(fileName);
+    if (file) {
+        file.close();
+        size_t dotPos = fileName.rfind('.');
+        if (dotPos != std::string::npos) {
+            std::string name = fileName.substr(0, dotPos);
+            std::string extension = fileName.substr(dotPos);
+            size_t counter = 1;
+            std::string newFileName;
+            do {
+                newFileName = name + "_" + std::to_string(counter++) + extension;
+            } while (std::ifstream(newFileName));
+            return newFileName;
+        }
+    }
+    return fileName;
 }
 
 int alectodb_download(){
