@@ -212,7 +212,7 @@ namespace inipp {
                         auto & sec = sections[section];
                         if (sec.find(variable) == sec.end()){
                             sec.emplace(variable, value);
-                            std::cout << "added " << variable << std::endl;
+                            //std::cout << "added " << variable << std::endl;
                         }
                         else
                             errors.push_back(line);
@@ -221,7 +221,7 @@ namespace inipp {
                         errors.push_back(line);
                     }
                     if (is.eof()){
-                        std::cout << "end of file" << std::endl;
+                        //std::cout << "end of file" << std::endl;
                         return 0;
                     }
                 }

@@ -217,7 +217,8 @@ int main(int argc, char* argv[]) {
             "                                                                            \n"
             "                   Common User Password Profiler ++                         \n"
             << endl;
-    auto start = std::chrono::system_clock::now();
+    //for performance monitoring enable the timer below
+    //auto start = std::chrono::system_clock::now();
 
     iniConfig::setConfig();
 
@@ -229,7 +230,8 @@ int main(int argc, char* argv[]) {
             cout << "List of commands:\n"
                     "-w filename.txt    Improve Existing File\n"
                     "-i                 Interactive\n"
-                    "-d                 Download Lists\n"
+                    "-d                 Download Lists [Experimental]\n"
+                    "-v                 Version\n"
                     << endl;
         }
         if(string(argv[i]) == "-w" || string(argv[i]) == "-W"){
@@ -242,10 +244,14 @@ int main(int argc, char* argv[]) {
         if (string(argv[i]) == "-d" || string(argv[i]) == "-D"){
             alectodb_download();
         }
+        if (string(argv[i]) == "-v" || string(argv[i]) == "-V"){
+            cout << "Version 1.0.0" << endl;
+        }
     }
-    auto end = std::chrono::system_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-    std::cout << elapsed.count() << '\n';
+    //for performance monitoring
+    //auto end = std::chrono::system_clock::now();
+    //auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    //std::cout << elapsed.count() << '\n';
 
     return 0;
 }
@@ -309,7 +315,6 @@ int improve_dictionary(string file_path){
  ************************************/
 
 //TODO: ADD INVALID INPUT HANDLING
-//TODO: CLEAN UP OLD COMMENTS
 
     ifstream fin(file_path, ios::in);
     if (!fin.is_open()) {
@@ -527,7 +532,18 @@ int improve_dictionary(string file_path){
 
 
     ofstream outputfile;
-    outputfile.open("open2.txt");
+    std::string fileName = "cupp_output.txt";
+    std::string newFileName = getNewFileName(fileName);
+
+    std::ofstream file(newFileName);
+    if (file) {
+        std::cout << "File created/opened: " << newFileName << std::endl;
+        // Rest of your file operations
+    } else {
+        std::cout << "Failed to create/open file." << std::endl;
+    }
+
+    outputfile.open(newFileName);
 
     cout << "Final list length : " << final_words_tmp.size() << endl;
     for (auto const &i:final_words_tmp){
@@ -550,7 +566,7 @@ int interactive_mode_input(){
 
     cout << "\n\n\nInsert information about the target" << endl;
     cout <<" [+] If you don't know all of the info, just hit enter when asked." << endl;
-    cout <<" [+] Special Characters, Years, Numbers, Password Min/Max, and Concatination can be editted without recompiling using config.ini" << endl;
+    cout <<" [+] Special Characters, Years, Numbers, Password Min/Max, and Concatination can be edited without recompiling using config.ini" << endl;
 
 
     unordered_map<string, string> profile{};
@@ -816,7 +832,7 @@ void interactive_mode_generate(unordered_map<string, string> profile){
 //probably should make a special permute function and pass profile too it.
 
 cout << endl;
-cout << "\n\nMaking a dictionary" << endl;
+cout << "\n\nMaking your final list. This may take awhile depending on the options selected above." << endl;
 //make unordered set for sending to make permutations
 unordered_set<string> name_parsed{}, profile_parsed{};
 unordered_set<string> name_combos{};
@@ -965,21 +981,23 @@ if (permute_level >= 3){
 
 combine_two_sets(&bday_parsed, &bday_parsed,&bday_combos, &final_output);
 if (permute_level >= 2){
-    combine_two_sets(&bday_parsed, &bday_combos,&bday_combos, &final_output);
     combine_two_sets(&name_parsed,&name_parsed, &name_combos, &final_output);
-    combine_two_sets(&bday_combos,&name_combos, &name_bd_combos, &final_output);
+
+        combine_two_sets(&bday_parsed, &bday_combos,&bday_combos, &final_output);
+        combine_two_sets(&bday_combos,&name_combos, &name_bd_combos, &final_output);
+
 
     //super slow if i add this
 // combine_two_sets(&name_parsed,&name_combos, &name_combos, &final_output);
 }
 
 
-if (permute_level >= 3)
-    combine_two_sets(&name_bd_combos,&bday_combos, &name_bd_combos, &final_output);
+if (permute_level >= 3) {
+        combine_two_sets(&name_bd_combos, &bday_combos, &name_bd_combos, &final_output);
+}
 
 //debug lines
-
-cout << "final bday+names combos output size: "<< final_output.size() << endl;
+//cout << "final bday+names combos output size: "<< final_output.size() << endl;
 
 if (profile.find("keywords") != profile.end())
     parse_spaces(profile.at("keywords"), &misc_parsed);
@@ -1002,12 +1020,11 @@ if (profile.find("city") != profile.end())
 if (profile.find("school") != profile.end())
     parse_spaces(profile.at("school"), &misc_parsed);
 
-combine_two_sets(&misc_parsed, &misc_parsed, &misc_parsed, &final_output);
+    combine_two_sets(&misc_parsed, &misc_parsed, &misc_parsed, &final_output);
 
-combine_two_sets(&name_bd_combos, &misc_parsed, &name_bd_combos, &final_output);
+    combine_two_sets(&name_bd_combos, &misc_parsed, &name_bd_combos, &final_output);
 
 //This is a slow way to do it, but it will work
-cout << "adding years";
 if (profile.find("years") != profile.end()){
     for (auto i:name_bd_combos){
         for (int j = 0; j < config.years.size(); j++){
@@ -1044,7 +1061,6 @@ if (profile.find("years") != profile.end()){
 }
 
 
-    cout << "adding randnums";
 
 if (profile.find("randnum") != profile.end() && profile.find("years") == profile.end()) {
     for (auto i: name_bd_combos) {
@@ -1066,7 +1082,6 @@ if (profile.find("randnum") != profile.end() && profile.find("years") == profile
 }
 
 
-cout << "adding spechars to " << final_output.size() << "words.";
 if (profile.find("spechars") != profile.end()) {
     if (profile.find("spechars_loc") != profile.end()){
         vector<string> spechars_built{};
@@ -1075,7 +1090,6 @@ if (profile.find("spechars") != profile.end()) {
     }
 }
 
-cout << "making leet " << final_output.size() << "words.";
 if(profile.find("leet_basic") != profile.end()){
     makeleet_short(&final_output);
 }
@@ -1083,7 +1097,7 @@ if(profile.find("leet_basic") != profile.end()){
 if(profile.find("leet_comprehensive") != profile.end()){
     makeleet_long(&final_output);
 }
-
+    cout << "creating output file" << endl;
     ofstream outputfile;
     std::string fileName = "cupp_output.txt";
     std::string newFileName = getNewFileName(fileName);
@@ -1091,37 +1105,15 @@ if(profile.find("leet_comprehensive") != profile.end()){
     std::ofstream file(newFileName);
     if (file) {
         std::cout << "File created/opened: " << newFileName << std::endl;
-        // Rest of your file operations
-    } else {
-        std::cout << "Failed to create/open file." << std::endl;
-    }
-
-    outputfile.open(newFileName);
-
-    cout << "Final list length : " << final_output.size() << endl;
-    for (auto const &i:final_output){
-        if (i.size() <= config.pwd_max_length && i.size() >= config.pwd_min_length)
-            outputfile << i << endl;
-    }
-}
-
-std::string getNewFileName(const std::string& fileName) {
-    std::ifstream file(fileName);
-    if (file) {
-        file.close();
-        size_t dotPos = fileName.rfind('.');
-        if (dotPos != std::string::npos) {
-            std::string name = fileName.substr(0, dotPos);
-            std::string extension = fileName.substr(dotPos);
-            size_t counter = 1;
-            std::string newFileName;
-            do {
-                newFileName = name + "_" + std::to_string(counter++) + extension;
-            } while (std::ifstream(newFileName));
-            return newFileName;
+        outputfile.open(newFileName);
+        cout << "Final list length : " << final_output.size() << endl;
+        for (auto const &i:final_output){
+            if (i.size() <= config.pwd_max_length && i.size() >= config.pwd_min_length)
+                outputfile << i << endl;
         }
+    } else {
+        std::cout << "Failed to create/open file. Ensure you have write permissions in the current directory and try again." << std::endl;
     }
-    return fileName;
 }
 
 int alectodb_download(){
@@ -1131,7 +1123,7 @@ int alectodb_download(){
     string path{};
     string file{}, file_selection{};
     int file_selection_int{};
-
+    cout << "\n\nDownload mode is still experimental. Expect breakages. Better support for this feature will be added in a coming release." << endl;
     cout << "\n\nPlease select download source: " << endl;
     cout << "1. AlectoDB (Legacy CUPP/2010 list)"
             "\n2. Default Credentials  (danielmiessler/SecLists Repo)"
@@ -1186,7 +1178,7 @@ int alectodb_download(){
         ofstream outputfile;
         outputfile.open(file_selection);
 
-        cout << "Final list length : " << results.size() << endl;
+        cout << "Final list length: " << results.size() << endl;
         for (auto i: results)
             outputfile << i;
     }
@@ -1454,6 +1446,25 @@ return 1;
  *      General Use Functions       *
  *                                  *
  ************************************/
+std::string getNewFileName(const std::string& fileName) {
+    std::ifstream file(fileName);
+    if (file) {
+        file.close();
+        size_t dotPos = fileName.rfind('.');
+        if (dotPos != std::string::npos) {
+            std::string name = fileName.substr(0, dotPos);
+            std::string extension = fileName.substr(dotPos);
+            size_t counter = 1;
+            std::string newFileName;
+            do {
+                newFileName = name + "_" + std::to_string(counter++) + extension;
+            } while (std::ifstream(newFileName));
+            return newFileName;
+        }
+    }
+    return fileName;
+}
+
 bool pass_too_short(string word, int adding){
     if ((word.size()) + adding < config.pwd_min_length){
         return true;
@@ -1606,7 +1617,7 @@ void add_spechars(vector<string> og_words, char location_spechars, unordered_set
         default: special_chars_append = true;
     }
 
-        //I'm sorry for the mess that follows. This can definitely be improved.
+        //I'm sorry for the mess that follows. This can definitely be improved to be more like the other add_spec chars function
     if (special_chars_append || special_chars_all){
         for (int i = 0; i < og_words.size(); i++){
             for (int spechar1 = 0; spechar1 < config.spechars.size(); spechar1++){
@@ -1815,7 +1826,6 @@ unordered_set<string> concat_list_on_right(unordered_set<string> og_words, unord
             string concat_output{};
             int concat_length = (*c).size();
             if ((*o) != (*c))
-                //TODO: pass_too_long may not be working like I think below. needs double checked.
                 if (!pass_too_long(*o, concat_length)){
                     output.insert(*o + *c);
                     output.insert(*c + *o);
@@ -1902,55 +1912,35 @@ void add_spechars(string spechars_loc, unordered_set<string> *final_words, vecto
             special_chars_append = true;
     }
     unordered_set<string>::iterator itr;
+    cout << "" << endl;
     int progress = 0;
-    //I'm sorry for the mess that follows. This can definitely be improved.
-    if (special_chars_append || special_chars_all) {
+    if (special_chars_all || special_chars_append || special_chars_bookend || special_chars_prepend) {
         for (itr = final_words->begin(); itr != final_words->end(); itr++) {
-            if (progress % 100 == 0){
-                cout << "Currently on word "<< progress;
-                cout << "\r";
-            }
-            progress++;
-            for (const string &spechar: spechars_vec) {
-                if (!pass_too_long((*itr), spechar.size()) && !pass_too_short((*itr), spechar.size()))
-                    final_words_tmp.insert((*itr) + spechar);
-            }
-        }
-    }
-    if (special_chars_prepend || special_chars_all) {
-        for (itr = final_words->begin(); itr != final_words->end(); itr++) {
-            if (progress % 100 == 0){
-                cout << "Currently on word "<< progress;
-                cout << "\r";
-            }
-            progress++;
-            for (const string &spechar: spechars_vec) {
-                if (!pass_too_long((*itr), spechar.size()) && !pass_too_short((*itr), spechar.size()))
-                    final_words_tmp.insert(spechar + (*itr));
-            }
-        }
-    }
-    if (special_chars_bookend || special_chars_all) {
-        for (itr = final_words->begin(); itr != final_words->end(); itr++) {
-            if (progress % 100 == 0){
-                cout << "Currently on word "<< progress;
-                cout << "\r";
-            }
-            progress++;
             for (const string &spechar: spechars_vec) {
                 if (!pass_too_long((*itr), spechar.size()) && !pass_too_short((*itr), spechar.size())) {
-                    final_words_tmp.insert(spechar + (*itr) + spechar);
-                    string spechar_copy = spechar;
-                    reverse(spechar_copy.begin(), spechar_copy.end());
-                    if (spechar_copy != spechar)
-                        final_words_tmp.insert(spechar_copy + (*itr) + spechar);
+                    progress++;
+                    //if (progress % 50000 == 0) {
+                    //    cout << "Adding Spec Chars. Currently adding to word " << progress << ": " << *itr << "\r";
+                    //}
+                    if (special_chars_append || special_chars_all)
+                        final_words_tmp.insert((*itr) + spechar);
+                    if (special_chars_prepend || special_chars_all)
+                        final_words_tmp.insert(spechar + (*itr));
+                    if (special_chars_bookend || special_chars_all) {
+                        final_words_tmp.insert(spechar + (*itr) + spechar);
+                        string spechar_copy = spechar;
+                        reverse(spechar_copy.begin(), spechar_copy.end());
+                        if (spechar_copy != spechar)
+                            final_words_tmp.insert(spechar_copy + (*itr) + spechar);
+
+                    }
                 }
             }
         }
+
+        for (auto i: final_words_tmp)
+            final_words->insert(i);
     }
-    cout << "added " << final_words_tmp.size() << "unique combos of words with special characters";
-    for (auto i:final_words_tmp)
-        final_words->insert(i);
 }
 
 vector<string> build_spechars(){
