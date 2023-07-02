@@ -1,5 +1,6 @@
 # CUPP++ 
-Common User Passwords Profiler in C++
+Common User Passwords Profiler in C++, ideal for generating unreasonably large lists.
+
 
 
 ## About
@@ -70,14 +71,24 @@ Requirements
 Ensure you select the right binary for your OS and ensure the config.ini file is
 in the same directory as the executable. 
 
-This will compile and has been tested on Windows and Mac. Binaries for Windows and Linux
-coming in the next few days. 
+Boost libraries are currently required. On linux OpenSSL is often already on your system
+to install Boost try the following 
 
+`sudo apt-get install libboost-all-dev`
+
+This will compile and has been tested on Windows and Mac.
+
+It was built with the latest boost lib for each respective package manager. Future versions will standardize this,
+but if you need to make edits and recompile change the boost version in CMakeLists.txt
+    * Homebrew (OSX) 1.82
+    * pacman (Arch) 1.81
+    * apt-get (Kali) 1.74
 
 Quick start
 -----------
+Ensure you have Boost and OpenSSL on your system then
 
-    $ ./cupp++ -h
+   `$ ./cupp++ -h`
 
 ## Options
 
