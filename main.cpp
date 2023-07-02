@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
             alectodb_download();
         }
         if (string(argv[i]) == "-v" || string(argv[i]) == "-V"){
-            cout << "Version 1.0.0" << endl;
+            cout << "Version 1.1.0" << endl;
         }
     }
     //for performance monitoring
