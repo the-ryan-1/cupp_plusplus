@@ -79,7 +79,7 @@ to install Boost try the following
 This will compile and has been tested on Windows and Mac.
 
 It was built with the latest boost lib for each respective package manager. Future versions will standardize this,
-but if you need to make edits and recompile change the boost version in CMakeLists.txt
+or move to static libs but if you need to make edits and recompile change the boost version in CMakeLists.txt
     * Homebrew (OSX) 1.82
     * pacman (Arch) 1.81
     * apt-get (Kali) 1.74
